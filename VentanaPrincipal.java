@@ -87,6 +87,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         panelDerecho.add(txtBusqueda = new JTextField("hola mundo")); 
         panelDerecho.add(btnBuscarOferta = new JButton("Buscar oferta"));
         panelDerecho.add(btnCerrarSesion = new JButton("Cerrar sesión"));
+        btnNuevaOferta.addMouseListener(this);
         btnCerrarSesion.addMouseListener(this);
         btnBuscarOferta.addMouseListener(this);
         panelBotonesGeneral.add(panelIzquierdo, BorderLayout.WEST);
@@ -179,6 +180,12 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         if(evento.getSource().equals(btnCerrarSesion)){
             new VentanaInicioSesion();
             dispose();
+        }
+        if(evento.getSource().equals(btnNuevaOferta)){
+            /**
+             * 1, se le enviará un id de Empleador.
+             */
+            new VentanaNuevaOferta(1);
         }
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();
