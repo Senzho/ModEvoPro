@@ -1,6 +1,8 @@
 package LogicaNegocio;
 
-public interface interfazNuevaOfertaSql {
+import java.util.ArrayList;
+
+public interface InterfazNuevaOfertaSql {
     public void guardarNuevaOferta(Oferta oferta, int idEmpleador);
-    public void guardarDiasOferta(Dia dia, int idOferta);
+    public void guardarDiasOferta(ArrayList<Dia> listaDias, int idOferta);
 }
