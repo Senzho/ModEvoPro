@@ -54,6 +54,7 @@ public class VentanaNuevaOferta extends JFrame{
         this.idEmpleador=idEmpleador;
         inicializarComponentes();
         establecerPropiedades();
+        cargarCombos();
     }
     
     public void inicializarComponentes(){
@@ -140,14 +141,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioLunes = new JComboBox();
-        comboInicioLunes.addItem("10:00");
         panelPrincipal.add(comboInicioLunes, constantes);
         constantes.gridx=4;
         constantes.gridy=7;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinLunes = new JComboBox();
-        comboFinLunes.addItem("20:00");
         panelPrincipal.add(comboFinLunes, constantes);
         constantes.gridx=2;
         constantes.gridy=8;
@@ -159,14 +158,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioMartes = new JComboBox();
-        comboInicioMartes.addItem("10:00");
         panelPrincipal.add(comboInicioMartes, constantes);
         constantes.gridx=4;
         constantes.gridy=8;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinMartes = new JComboBox();
-        comboFinMartes.addItem("20:00");
         panelPrincipal.add(comboFinMartes, constantes);
         constantes.gridx=2;
         constantes.gridy=9;
@@ -178,14 +175,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioMiercoles = new JComboBox();
-        comboInicioMiercoles.addItem("10:00");
         panelPrincipal.add(comboInicioMiercoles, constantes);
         constantes.gridx=4;
         constantes.gridy=9;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinMiercoles = new JComboBox();
-        comboFinMiercoles.addItem("20:00");
         panelPrincipal.add(comboFinMiercoles, constantes);
         constantes.gridx=2;
         constantes.gridy=10;
@@ -197,14 +192,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioJueves = new JComboBox();
-        comboInicioJueves.addItem("10:00");
         panelPrincipal.add(comboInicioJueves, constantes);
         constantes.gridx=4;
         constantes.gridy=10;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinJueves = new JComboBox();
-        comboFinJueves.addItem("20:00");
         panelPrincipal.add(comboFinJueves, constantes);
         constantes.gridx=2;
         constantes.gridy=11;
@@ -216,14 +209,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioViernes = new JComboBox();
-        comboInicioViernes.addItem("10:00");
         panelPrincipal.add(comboInicioViernes, constantes);
         constantes.gridx=4;
         constantes.gridy=11;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinViernes = new JComboBox();
-        comboFinViernes.addItem("20:00");
         panelPrincipal.add(comboFinViernes, constantes);
         constantes.gridx=2;
         constantes.gridy=12;
@@ -235,14 +226,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioSabado = new JComboBox();
-        comboInicioSabado.addItem("10:00");
         panelPrincipal.add(comboInicioSabado, constantes);
         constantes.gridx=4;
         constantes.gridy=12;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinSabado = new JComboBox();
-        comboFinSabado.addItem("20:00");
         panelPrincipal.add(comboFinSabado, constantes);
         constantes.gridx=2;
         constantes.gridy=13;
@@ -254,14 +243,12 @@ public class VentanaNuevaOferta extends JFrame{
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboInicioDomingo = new JComboBox();
-        comboInicioDomingo.addItem("10:00");
         panelPrincipal.add(comboInicioDomingo, constantes);
         constantes.gridx=4;
         constantes.gridy=13;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         comboFinDomingo = new JComboBox();
-        comboFinDomingo.addItem("20:00");
         panelPrincipal.add(comboFinDomingo, constantes);
         constantes.gridx=3;
         constantes.gridy=15;
@@ -277,5 +264,30 @@ public class VentanaNuevaOferta extends JFrame{
     public void establecerPropiedades(){
         this.txtAreaDescripcion.setWrapStyleWord(true);
         this.txtAreaDescripcion.setLineWrap(true);
+    }
+    public void cargarCombos(){
+        cargarHoras(this.comboInicioDomingo);
+        cargarHoras(this.comboInicioLunes);
+        cargarHoras(this.comboInicioMartes);
+        cargarHoras(this.comboInicioMiercoles);
+        cargarHoras(this.comboInicioJueves);
+        cargarHoras(this.comboInicioViernes);
+        cargarHoras(this.comboInicioSabado);
+        cargarHoras(this.comboFinDomingo);
+        cargarHoras(this.comboFinLunes);
+        cargarHoras(this.comboFinMartes);
+        cargarHoras(this.comboFinMiercoles);
+        cargarHoras(this.comboFinJueves);
+        cargarHoras(this.comboFinViernes);
+        cargarHoras(this.comboFinSabado);
+    }
+    public void cargarHoras(JComboBox combo){
+        for(int c=0; c<25;c++){
+            if (c<10){
+                combo.addItem("0"+c+":00");
+            }else{
+                combo.addItem(c+":00");
+            }
+        }
     }
 }
