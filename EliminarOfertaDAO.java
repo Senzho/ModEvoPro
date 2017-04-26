@@ -31,7 +31,7 @@ public class EliminarOfertaDAO implements InterfazEliminarOfertaSql {
         Connection conexionInicio=conexion.getConexion();
         try {    
             PreparedStatement orden;
-            orden = conexionInicio.prepareStatement("delete from Dia where idOferta = ?");
+            orden = conexionInicio.prepareStatement("delete from dias where idOferta = ?");
             orden.setInt(1, idOferta);
             orden.execute();
         } catch (SQLException | NullPointerException excepcion) {
