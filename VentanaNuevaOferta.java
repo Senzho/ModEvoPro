@@ -83,7 +83,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
         constantes.fill = GridBagConstraints.NONE;
-        JLabel lblVacante = new JLabel("Vacante: ");
+        JLabel lblVacante = new JLabel("Puesto: ");
         panelPrincipal.add(lblVacante, constantes);
         constantes.gridx = 1;
         constantes.gridy = 0;

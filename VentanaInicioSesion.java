@@ -56,7 +56,20 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
             botonEntrar.setBounds(180, 160, 85,30);
             botonEntrar.addActionListener(this);
         }
-        
+        public void inicioSesion(){
+        	InicioSesionDAO accesoSesion = new InicioSesionDAO();
+            CuentaValidada cuentaValidada = accesoSesion.validarCuenta(textoUsuario.getText(), contrasena);
+            if (cuentaValidada.getCodigoAutenticacion()==CodigoAutenticacion.AutenticacionExitosa){
+                new VentanaPrincipal(cuentaValidada.getIdCuenta());
+                dispose();
+            }else{
+                if (cuentaValidada.getCodigoAutenticacion()==CodigoAutenticacion.UsuarioNoEncontrado){
+                    JOptionPane.showMessageDialog(null, "Usuario no encontrado, prueba otra vez");
+                }else{
+            	    JOptionPane.showMessageDialog(null, "Usuario o contraseña inválida");
+                }
+            }
+        }
         @Override
         public void keyPressed(KeyEvent evento){
             int codigoTecla=evento.getKeyCode();
@@ -80,6 +93,11 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
                         evento.consume();
                         textoContrasenia.setText("Ingresa tu contraseña");
                     }
+                }
+                if(evento.getSource().equals(textoContrasenia)){
+                	if(evento.getKeyCode() == 13){
+                		inicioSesion();
+                	}
                 }
             }
         }
@@ -107,18 +125,7 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
         @Override
         public void actionPerformed(ActionEvent evento){
             if (evento.getSource()==botonEntrar){
-                InicioSesionDAO accesoSesion = new InicioSesionDAO();
-                CuentaValidada cuentaValidada = accesoSesion.validarCuenta(textoUsuario.getText(), contrasena);
-                if (cuentaValidada.getCodigoAutenticacion()==CodigoAutenticacion.AutenticacionExitosa){
-                    new VentanaPrincipal(cuentaValidada.getIdCuenta());
-                    dispose();
-                }else{
-                    if (cuentaValidada.getCodigoAutenticacion()==CodigoAutenticacion.UsuarioNoEncontrado){
-                        JOptionPane.showMessageDialog(null, "Usuario no encontrado, prueba otra vez");
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Usuario o contraseña inválida");
-                    }
-                }
+                inicioSesion();
             }else if(evento.getSource()==botonSalir){
                 dispose();
             }
