@@ -145,7 +145,8 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             Oferta oferta = listaOfertas.get(c);
             JPanel panelOferta = new JPanel();
             panelOferta.setLayout(new BorderLayout());
-            JLabel vacante = new JLabel("Vacante: "+oferta.getVacante());
+            JLabel vacante = new JLabel(oferta.getVacante());
+            JLabel vacantes = new JLabel("Numero de vacantes: "+String.valueOf(oferta.getNumeroVacantes()));
             JButton botonEditar = new JButton("Editar");
             botonEditar.setName(String.valueOf(oferta.getIdOferta()));
             botonEditar.addMouseListener(this);
@@ -162,6 +163,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             flowDatos.setVgap(10);
             panelDatos.setLayout(flowDatos);
             panelDatos.add(vacante);
+            panelDatos.add(vacantes);
             panelOferta.add(panelDatos, BorderLayout.LINE_START);
             panelOferta.add(panelBoton, BorderLayout.LINE_END);
             panelOfertas.add(panelOferta);
