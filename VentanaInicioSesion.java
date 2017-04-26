@@ -93,11 +93,9 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
                         evento.consume();
                         textoContrasenia.setText("Ingresa tu contraseña");
                     }
-                }
-                if(evento.getSource().equals(textoContrasenia)){
-                	if(evento.getKeyCode() == 13){
-                		inicioSesion();
-                	}
+                    if (codigoTecla==10){
+                        inicioSesion();
+                    }
                 }
             }
         }
