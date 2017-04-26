@@ -4,6 +4,7 @@ import LogicaNegocio.Empleador;
 import LogicaNegocio.Oferta;
 import LogicaNegocio.Solicitante;
 import LogicaNegocio.VentanaPrincipalDAO;
+import LogicaNegocio.EliminarOfertaDAO;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 
 public class VentanaPrincipal extends JFrame implements MouseListener{
     private JButton btnEditarInformacion;
@@ -190,6 +192,11 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             JButton boton = (JButton) evento.getSource();
             if (boton.getText().equals("Ver más")){
                 new VentanaDetallesOferta(Integer.parseInt(boton.getName()));
+            }else if(boton.getText().equals("Eliminar")){
+            	EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
+            	eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
+            	eliminarOferta.eliminarOferta(Integer.parseInt(boton.getName()));
+            	JOptionPane.showMessageDialog(null,"Oferta eliminada");
             }
         }
     }
