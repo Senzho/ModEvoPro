@@ -7,8 +7,12 @@ import LogicaNegocio.CodigoErrorOferta;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -21,7 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class VentanaNuevaOferta extends JFrame implements MouseListener{
+public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyListener, ItemListener{
     private JPanel panelPrincipal;
     private JTextField txtVacante;
     private JScrollPane scrollDescripcion;
@@ -274,8 +278,13 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener{
     public void establecerPropiedades(){
         this.txtAreaDescripcion.setWrapStyleWord(true);
         this.txtAreaDescripcion.setLineWrap(true);
+        this.txtAreaDescripcion.addKeyListener(this);
         this.btnCancelar.addMouseListener(this);
         this.btnCrear.addMouseListener(this);
+        this.txtVacantes.setText("0");
+        this.txtVacantes.addKeyListener(this);
+        this.txtVacante.addKeyListener(this);
+        this.txtSalario.addKeyListener(this);
     }
     public void cargarCombos(){
         cargarHoras(this.comboInicioDomingo);
@@ -308,12 +317,27 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener{
             codigo = CodigoErrorOferta.vacanteVacia;
         }else if(oferta.getDescripcion().equals("")){
             codigo = CodigoErrorOferta.descripcionVacia;
+        }else if(oferta.getDescripcion().length()>500){
+            codigo = CodigoErrorOferta.descripcionLarga;
         }else if(oferta.getSalario().equals("")){
             codigo = CodigoErrorOferta.salarioVacio;
-        }else if(String.valueOf(oferta.getNumeroVacantes()).equals("")){
+        }else if(String.valueOf(oferta.getNumeroVacantes()).equals("0")){
             codigo = CodigoErrorOferta.vacantesVacia;
         }else if(!validarHorario()){
             codigo = CodigoErrorOferta.horarioVacio;
+        }else{
+            if (validarHorario()){
+                ArrayList<Dia> lista = oferta.getListaDias();
+                for(int c=0; c<lista.size(); c++){
+                    Dia dia = lista.get(c);
+                    int inicio = Integer.parseInt(dia.getHoraInicio().substring(0, 2));
+                    int fin = Integer.parseInt(dia.getHoraFin().substring(0, 2));
+                    if (!horasValidas(inicio, fin)){
+                        codigo= CodigoErrorOferta.horasInvalidas;
+                        c=lista.size();
+                    }
+                }
+            }
         }
         return codigo;
     }
@@ -323,6 +347,38 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener{
             valido=true;
         }
         return valido;
+    }
+    public ArrayList<Dia> capturarDias(){
+        ArrayList<Dia> lista = new ArrayList<Dia>();
+        if (this.checkLunes.isSelected()){
+            lista.add(new Dia("Lunes", this.comboInicioLunes.getSelectedItem().toString(), this.comboFinLunes.getSelectedItem().toString()));
+        }
+        if (this.checkMartes.isSelected()){
+            lista.add(new Dia("Martes", this.comboInicioMartes.getSelectedItem().toString(), this.comboFinMartes.getSelectedItem().toString()));
+        }
+        if (this.checkMiercoles.isSelected()){
+            lista.add(new Dia("Miercoles", this.comboInicioMiercoles.getSelectedItem().toString(), this.comboFinMiercoles.getSelectedItem().toString()));
+        }
+        if (this.checkJueves.isSelected()){
+            lista.add(new Dia("Jueves", this.comboInicioJueves.getSelectedItem().toString(), this.comboFinJueves.getSelectedItem().toString()));
+        }
+        if (this.checkViernes.isSelected()){
+            lista.add(new Dia("Viernes", this.comboInicioViernes.getSelectedItem().toString(), this.comboFinViernes.getSelectedItem().toString()));
+        }
+        if (this.checkSabado.isSelected()){
+            lista.add(new Dia("Sabado", this.comboInicioSabado.getSelectedItem().toString(), this.comboFinSabado.getSelectedItem().toString()));
+        }
+        if (this.checkDomingo.isSelected()){
+            lista.add(new Dia("Domingo", this.comboInicioDomingo.getSelectedItem().toString(), this.comboFinDomingo.getSelectedItem().toString()));
+        }
+        return lista;
+    }
+    public boolean horasValidas(int inicio, int fin){
+        boolean validas = false;
+        if (inicio<fin && fin>inicio){
+            validas = true;
+        }
+        return validas;
     }
 
     /**
@@ -342,25 +398,36 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener{
             int numeroVacantes = Integer.parseInt(this.txtVacantes.getText());
             String salario = this.txtSalario.getText();
             String descripcion = this.txtAreaDescripcion.getText();
-            Oferta oferta = new Oferta(idOferta, vacante, empresa, numeroVacantes, salario, descripcion, new ArrayList<Dia>());
+            Oferta oferta = new Oferta(idOferta, vacante, empresa, numeroVacantes, salario, descripcion, this.capturarDias());
             CodigoErrorOferta codigo = this.validarOferta(oferta);
-            if (codigo.equals(CodigoErrorOferta.vacanteVacia)){
-                JOptionPane.showMessageDialog(null, "Ingresa la vacante.");
-            }else if(codigo.equals(CodigoErrorOferta.descripcionVacia)){
-                JOptionPane.showMessageDialog(null, "Ingresa la descripción.");
-            }else if(codigo.equals(CodigoErrorOferta.salarioVacio)){
-                JOptionPane.showMessageDialog(null, "Ingresa el salario.");
-            }else if(codigo.equals(CodigoErrorOferta.vacantesVacia)){
-                JOptionPane.showMessageDialog(null, "Ingresa el numero de vacantes.");
-            }else if(codigo.equals(CodigoErrorOferta.horarioVacio)){
-                JOptionPane.showMessageDialog(null, "Selecciona el horario.");
-            }else{
-                nuevaOferta.guardarNuevaOferta(oferta, idEmpleador);
-                /**
-                 * Debe guardar los días en este punto.
-                 */
-                JOptionPane.showMessageDialog(null, "Oferta guardada!");
-                dispose();
+            switch(codigo){
+                case vacanteVacia:
+                    JOptionPane.showMessageDialog(null, "Ingresa la vacante.");
+                break;
+                case descripcionVacia:
+                    JOptionPane.showMessageDialog(null, "Ingresa la descripción.");
+                break;
+                case descripcionLarga:
+                    JOptionPane.showMessageDialog(null, "La descripción es demasiado larga (más de 500 caractéres).");
+                break;
+                case salarioVacio:
+                    JOptionPane.showMessageDialog(null, "Ingresa el salario.");
+                break;
+                case vacantesVacia:
+                    JOptionPane.showMessageDialog(null, "Ingresa el numero de vacantes.");
+                break;
+                case horarioVacio:
+                    JOptionPane.showMessageDialog(null, "Selecciona el horario.");
+                break;
+                case horasInvalidas:
+                    JOptionPane.showMessageDialog(null, "La hora de inicio no puede ser mayor a la hora de fin y viceversa.");
+                break;
+                case exito:
+                    nuevaOferta.guardarNuevaOferta(oferta, idEmpleador);
+                    nuevaOferta.guardarDiasOferta(oferta.getListaDias(), idOferta);
+                    JOptionPane.showMessageDialog(null, "Oferta guardada!");
+                    dispose();
+                break;
             }
         }
     }
@@ -378,6 +445,57 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener{
     }
     @Override
     public void mouseExited(MouseEvent evento) {
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent evento) {
+        if (evento.getSource().equals(this.txtAreaDescripcion)){
+            int largoTexto=this.txtAreaDescripcion.getText().length();
+            if (largoTexto>499){
+                evento.consume();
+                JOptionPane.showMessageDialog(null, "No puedes escribir más de 500 caractéres");
+            }
+        }
+        if (evento.getSource().equals(this.txtVacante)){
+            int largoTexto=this.txtVacante.getText().length();
+            if (largoTexto>49){
+                evento.consume();
+            }
+        }
+        if (evento.getSource().equals(this.txtSalario)){
+            int largoTexto=this.txtSalario.getText().length();
+            if (largoTexto>29){
+                evento.consume();
+            }
+        }
+        if (evento.getSource().equals(this.txtVacantes)){
+            char caracter = evento.getKeyChar();
+            if (!Character.isDigit(caracter) && caracter!=8){
+                evento.consume();
+            }
+        }
+    }
+    @Override
+    public void keyPressed(KeyEvent evento) {
+        if (evento.getSource().equals(this.txtVacantes)){
+            char caracter = evento.getKeyChar();
+            if ((caracter==8 || caracter==127) && this.txtVacantes.getText().length()==1){
+                evento.consume();
+                this.txtVacantes.setText("0");
+            }else if(this.txtVacantes.getText().length()==1 && this.txtVacantes.getText().equals("0") && Character.isDigit(caracter)){
+                evento.consume();
+                this.txtVacantes.setText("");
+            }
+        }
+    }
+    @Override
+    public void keyReleased(KeyEvent evento) {
+        
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent evento) {
         
     }
 }
