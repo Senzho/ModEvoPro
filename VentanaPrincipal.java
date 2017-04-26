@@ -182,7 +182,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             dispose();
         }
         if(evento.getSource().equals(btnNuevaOferta)){
-            new VentanaNuevaOferta(empleador.getIdEmpleador());
+            new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa());
         }
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();

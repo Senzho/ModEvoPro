@@ -3,7 +3,9 @@ package LogicaNegocio;
 import AccesoDatos.ConexionSQL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class NuevaOfertaDAO implements InterfazNuevaOfertaSql{
             orden.setInt(4, numeroVacantes);
             orden.setString(5, salario);
             orden.setString(6, descripcion);
+            orden.setInt(7, idEmpleador);
             orden.execute();
         } catch (SQLException | NullPointerException excepcion) {
             Logger logger = Logger.getLogger("Logger");
@@ -47,7 +50,7 @@ public class NuevaOfertaDAO implements InterfazNuevaOfertaSql{
                 String nombre = dia.getNombre();
                 String horaInicio = dia.getHoraInicio();
                 String horaFin = dia.getHoraFin();
-                orden = conexionInicio.prepareStatement("insert into dia (nombre, horaInicio, horaFin, idOferta) values (?,?,?,?)");
+                orden = conexionInicio.prepareStatement("insert into dias (nombre, horaInicio, horaFin, idOferta) values (?,?,?,?)");
                 orden.setString(1, nombre);
                 orden.setString(2, horaInicio);
                 orden.setString(3, horaFin);
@@ -60,5 +63,25 @@ public class NuevaOfertaDAO implements InterfazNuevaOfertaSql{
         }finally{
             conexion.cerrarConexion();
         }             
+    }
+    @Override
+    public int getUltimoIdOferta() {
+        int id = 0;
+        ConexionSQL conexion = new ConexionSQL();
+        Connection conexionInicio=conexion.getConexion();
+        try{
+            Statement orden=conexionInicio.createStatement();
+            ResultSet resultadoConsulta;
+            resultadoConsulta=orden.executeQuery("select * from oferta");
+            if (resultadoConsulta.last()){
+                id=resultadoConsulta.getInt(1);
+            }
+        } catch (SQLException | NullPointerException excepcion) {
+            Logger logger = Logger.getLogger("Logger");
+            logger.log(Level.WARNING, "La conexión podría ser nula | la sentencia SQL esta mal");
+        }finally{
+            conexion.cerrarConexion();
+        }   
+        return id;
     }
 }
