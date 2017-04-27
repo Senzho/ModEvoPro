@@ -402,7 +402,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
             CodigoErrorOferta codigo = this.validarOferta(oferta);
             switch(codigo){
                 case vacanteVacia:
-                    JOptionPane.showMessageDialog(null, "Ingresa la vacante.");
+                    JOptionPane.showMessageDialog(null, "Ingresa el puesto.");
                 break;
                 case descripcionVacia:
                     JOptionPane.showMessageDialog(null, "Ingresa la descripción.");
