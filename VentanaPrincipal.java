@@ -40,8 +40,10 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
     private ArrayList<Oferta> listaOfertas;
     
     private int tipo;
+    private int idCuenta;
     
     public VentanaPrincipal(int idCuenta){
+        this.idCuenta=idCuenta;
         setTitle("Bolsa de trabajo UV");
         setSize(800,500);
         setMinimumSize(new Dimension(800,500));
@@ -186,7 +188,8 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             dispose();
         }
         if(evento.getSource().equals(btnNuevaOferta)){
-            new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa());
+            new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa(), this.idCuenta);
+            dispose();
         }
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();
@@ -197,6 +200,10 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             	eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
             	eliminarOferta.eliminarOferta(Integer.parseInt(boton.getName()));
             	JOptionPane.showMessageDialog(null,"Oferta eliminada");
+                VentanaPrincipalDAO ventanaPrincipal = new VentanaPrincipalDAO();
+                this.empleador=ventanaPrincipal.getEmpleador(idCuenta);
+                ArrayList<Oferta> lista = empleador.getListaOfertas();
+                this.mostrarOfertasEmpleador(lista);
             }
         }
     }

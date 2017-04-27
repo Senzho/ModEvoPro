@@ -58,8 +58,10 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     
     private int idEmpleador;
     private String nombreEmpresa;
+    private int idCuenta;
     
-    public VentanaNuevaOferta(int idEmpleador, String nombreEmpresa){
+    public VentanaNuevaOferta(int idEmpleador, String nombreEmpresa, int idCuenta){
+        this.idCuenta=idCuenta;
         setVisible(true);
         setSize(500,500);
         setTitle("Nueva oferta");
@@ -426,6 +428,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
                     nuevaOferta.guardarNuevaOferta(oferta, idEmpleador);
                     nuevaOferta.guardarDiasOferta(oferta.getListaDias(), idOferta);
                     JOptionPane.showMessageDialog(null, "Oferta guardada!");
+                    new VentanaPrincipal(idCuenta);
                     dispose();
                 break;
             }
