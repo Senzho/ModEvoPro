@@ -55,12 +55,13 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     private JComboBox comboFinViernes;
     private JComboBox comboFinSabado;
     private JComboBox comboFinDomingo;
+    private Oferta oferta;
     
     private int idEmpleador;
     private String nombreEmpresa;
     private int idCuenta;
     
-    public VentanaNuevaOferta(int idEmpleador, String nombreEmpresa, int idCuenta){
+    public VentanaNuevaOferta(int idEmpleador, String nombreEmpresa, int idCuenta, Oferta oferta){
         this.idCuenta=idCuenta;
         setVisible(true);
         setSize(500,500);
@@ -68,9 +69,11 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         setLocationRelativeTo(null);
         this.idEmpleador=idEmpleador;
         this.nombreEmpresa=nombreEmpresa;
+        this.oferta = oferta;
         inicializarComponentes();
         establecerPropiedades();
         cargarCombos();
+    
     }
     
     public void inicializarComponentes(){
@@ -287,6 +290,54 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         this.txtVacantes.addKeyListener(this);
         this.txtVacante.addKeyListener(this);
         this.txtSalario.addKeyListener(this);
+        if(oferta != null){
+            this.btnCrear.setText("guardar");
+            mostrarDatos();
+        }
+    }
+    public void mostrarDatos(){
+        this.txtAreaDescripcion.setText(oferta.getDescripcion());
+        this.txtSalario.setText(oferta.getSalario());
+        this.txtVacante.setText(oferta.getVacante());
+        this.txtVacantes.setText(Integer.toString(oferta.getNumeroVacantes()));
+        for(int i = 0; i<oferta.getListaDias().size(); i++){
+            Dia dia = oferta.getListaDias().get(i);
+            if(dia.getNombre().equals("Lunes")){
+                this.checkLunes.setSelected(true);
+                this.comboInicioLunes.setSelectedItem(dia.getHoraInicio());
+                this.comboFinLunes.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Martes")){
+                this.checkMartes.setSelected(true);
+                this.comboInicioMartes.setSelectedItem(dia.getHoraInicio());
+                this.comboFinMartes.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Miercoles")){
+                this.checkMiercoles.setSelected(true);
+                this.comboInicioMiercoles.setSelectedItem(dia.getHoraInicio());
+                this.comboFinMiercoles.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Jueves")){
+                this.checkJueves.setSelected(true);
+                this.comboInicioJueves.setSelectedItem(dia.getHoraInicio());
+                this.comboFinJueves.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Viernes")){
+                this.checkJueves.setSelected(true);
+                this.comboInicioJueves.setSelectedItem(dia.getHoraInicio());
+                this.comboFinJueves.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Sabado")){
+                this.checkSabado.setSelected(true);
+                this.comboInicioSabado.setSelectedItem(dia.getHoraInicio());
+                this.comboFinSabado.setSelectedItem(dia.getHoraFin());
+            }
+            if(dia.getNombre().equals("Domingo")){
+                this.checkDomingo.setSelected(true);
+                this.comboInicioDomingo.setSelectedItem(dia.getHoraInicio());
+                this.comboFinDomingo.setSelectedItem(dia.getHoraFin());
+            }
+        }
     }
     public void cargarCombos(){
         cargarHoras(this.comboInicioDomingo);
