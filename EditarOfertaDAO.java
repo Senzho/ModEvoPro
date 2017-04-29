@@ -62,9 +62,10 @@ public class EditarOfertaDAO implements InterfazEditarOferta{
                 Dia dia = listaDias.get(c);
                 PreparedStatement orden;
                 if (diaExiste(dia.getNombre(), idOferta)){
-                    orden = conexionInicio.prepareStatement("update dias set horaInicio = ?, horaFin = ?");
+                    orden = conexionInicio.prepareStatement("update dias set horaInicio = ?, horaFin = ? where idOferta = ?");
                     orden.setString(1, dia.getHoraInicio());
                     orden.setString(2, dia.getHoraFin());
+                    orden.setInt(3, idOferta);
                     orden.executeQuery();
                 }else{
                     orden = conexionInicio.prepareStatement("insert into dias values(?, ?, ?, ?)");
