@@ -4,6 +4,7 @@ import LogicaNegocio.Dia;
 import LogicaNegocio.NuevaOfertaDAO;
 import LogicaNegocio.Oferta;
 import LogicaNegocio.CodigoErrorOferta;
+import LogicaNegocio.EditarOfertaDAO;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -55,7 +56,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     private JComboBox comboFinViernes;
     private JComboBox comboFinSabado;
     private JComboBox comboFinDomingo;
-    private Oferta oferta;
+    private Oferta ofertaGeneral;
     
     private int idEmpleador;
     private String nombreEmpresa;
@@ -69,11 +70,10 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         setLocationRelativeTo(null);
         this.idEmpleador=idEmpleador;
         this.nombreEmpresa=nombreEmpresa;
-        this.oferta = oferta;
+        this.ofertaGeneral = oferta;
         inicializarComponentes();
-        establecerPropiedades();
         cargarCombos();
-    
+        establecerPropiedades();
     }
     
     public void inicializarComponentes(){
@@ -290,18 +290,20 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         this.txtVacantes.addKeyListener(this);
         this.txtVacante.addKeyListener(this);
         this.txtSalario.addKeyListener(this);
-        if(oferta != null){
-            this.btnCrear.setText("guardar");
+        if(ofertaGeneral != null){
+            this.btnCrear.setText("Guardar");
             mostrarDatos();
         }
     }
     public void mostrarDatos(){
-        this.txtAreaDescripcion.setText(oferta.getDescripcion());
-        this.txtSalario.setText(oferta.getSalario());
-        this.txtVacante.setText(oferta.getVacante());
-        this.txtVacantes.setText(Integer.toString(oferta.getNumeroVacantes()));
-        for(int i = 0; i<oferta.getListaDias().size(); i++){
-            Dia dia = oferta.getListaDias().get(i);
+        this.txtAreaDescripcion.setText(ofertaGeneral.getDescripcion());
+        this.txtSalario.setText(ofertaGeneral.getSalario());
+        this.txtVacante.setText(ofertaGeneral.getVacante());
+        this.txtVacantes.setText(Integer.toString(ofertaGeneral.getNumeroVacantes()));
+        for(int i = 0; i<ofertaGeneral.getListaDias().size(); i++){
+            Dia dia = ofertaGeneral.getListaDias().get(i);
+            String nombre = dia.getNombre();
+            nombre = nombre;
             if(dia.getNombre().equals("Lunes")){
                 this.checkLunes.setSelected(true);
                 this.comboInicioLunes.setSelectedItem(dia.getHoraInicio());
@@ -323,9 +325,9 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
                 this.comboFinJueves.setSelectedItem(dia.getHoraFin());
             }
             if(dia.getNombre().equals("Viernes")){
-                this.checkJueves.setSelected(true);
-                this.comboInicioJueves.setSelectedItem(dia.getHoraInicio());
-                this.comboFinJueves.setSelectedItem(dia.getHoraFin());
+                this.checkViernes.setSelected(true);
+                this.comboInicioViernes.setSelectedItem(dia.getHoraInicio());
+                this.comboFinViernes.setSelectedItem(dia.getHoraFin());
             }
             if(dia.getNombre().equals("Sabado")){
                 this.checkSabado.setSelected(true);
@@ -476,9 +478,16 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
                     JOptionPane.showMessageDialog(null, "La hora de inicio no puede ser mayor a la hora de fin y viceversa.");
                 break;
                 case exito:
-                    nuevaOferta.guardarNuevaOferta(oferta, idEmpleador);
-                    nuevaOferta.guardarDiasOferta(oferta.getListaDias(), idOferta);
-                    JOptionPane.showMessageDialog(null, "Oferta guardada!");
+                    if (oferta != null){
+                         EditarOfertaDAO editarOferta = new EditarOfertaDAO();
+                         editarOferta.editarOferta(oferta, idEmpleador, ofertaGeneral.getIdOferta());
+                         editarOferta.editarDias(oferta.getListaDias(), ofertaGeneral.getIdOferta());
+                         JOptionPane.showMessageDialog(null, "Oferta guardada!");
+                    }else{
+                        nuevaOferta.guardarNuevaOferta(oferta, idEmpleador);
+                        nuevaOferta.guardarDiasOferta(oferta.getListaDias(), idOferta);
+                        JOptionPane.showMessageDialog(null, "Oferta creada!");
+                    }
                     new VentanaPrincipal(idCuenta);
                     dispose();
                 break;

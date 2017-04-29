@@ -1,5 +1,6 @@
 package InterfazGrafica;
 
+import LogicaNegocio.DetallesOfertaDAO;
 import LogicaNegocio.Empleador;
 import LogicaNegocio.Oferta;
 import LogicaNegocio.Solicitante;
@@ -14,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,7 +50,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         setSize(800,500);
         setMinimumSize(new Dimension(800,500));
         setLocationRelativeTo(null);
-        //setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/iconoDrakzo3.png")).getImage());
+        setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
         setVisible(true);
         setResizable(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -188,7 +190,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             dispose();
         }
         if(evento.getSource().equals(btnNuevaOferta)){
-            new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa(), this.idCuenta);
+            new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa(), this.idCuenta, null);
             dispose();
         }
         if (evento.getSource() instanceof JButton){
@@ -196,14 +198,19 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             if (boton.getText().equals("Ver más")){
                 new VentanaDetallesOferta(Integer.parseInt(boton.getName()));
             }else if(boton.getText().equals("Eliminar")){
-            	EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
-            	eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
-            	eliminarOferta.eliminarOferta(Integer.parseInt(boton.getName()));
-            	JOptionPane.showMessageDialog(null,"Oferta eliminada");
+                EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
+                eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
+                eliminarOferta.eliminarOferta(Integer.parseInt(boton.getName()));
+                JOptionPane.showMessageDialog(null,"Oferta eliminada");
                 VentanaPrincipalDAO ventanaPrincipal = new VentanaPrincipalDAO();
                 this.empleador=ventanaPrincipal.getEmpleador(idCuenta);
                 ArrayList<Oferta> lista = empleador.getListaOfertas();
                 this.mostrarOfertasEmpleador(lista);
+            }else if(boton.getText().equals("Editar")){
+                DetallesOfertaDAO detallesOferta = new DetallesOfertaDAO();
+                Oferta oferta = detallesOferta.getOferta(Integer.parseInt(boton.getName()));
+                new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa(), this.idCuenta, oferta);
+                dispose();
             }
         }
     }
