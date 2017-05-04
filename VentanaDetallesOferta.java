@@ -12,10 +12,14 @@ import javax.swing.JScrollPane;
 import LogicaNegocio.DetallesOfertaDAO;
 import LogicaNegocio.Dia;
 import LogicaNegocio.Oferta;
+import java.awt.Insets;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 
-public class VentanaDetallesOferta extends JFrame {
+public class VentanaDetallesOferta extends JFrame implements MouseListener{
     private JButton btnAceptar;
     private JButton btnCancelar;
     private JPanel panelPuesto;
@@ -34,15 +38,20 @@ public class VentanaDetallesOferta extends JFrame {
     private JPanel panelDias;
     private JTextArea txtDescripcion;
     private JScrollPane scrollDias;
+    
     private int idOferta;
     private Oferta oferta;
+    private int tipoUsuario;
     
-    public VentanaDetallesOferta(int idOferta){
+    public VentanaDetallesOferta(int idOferta, int tipoUsuario){
         this.idOferta=idOferta;
+        this.tipoUsuario = tipoUsuario;
         DetallesOfertaDAO detallesOferta = new DetallesOfertaDAO();
         oferta = detallesOferta.getOferta(idOferta);
         inicializarComponentes();
+        establecerPropiedades();
         mostrarDias();
+        setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
         setVisible(true);
         setSize(300,400);
         setTitle("Detalles oferta");
@@ -76,15 +85,15 @@ public class VentanaDetallesOferta extends JFrame {
         panelLblDescripcion.setLayout(flowPanelDescripcion);
         panelLblDescripcion.add(new JLabel("Descripción:"));
         panelDescripcion.add(panelLblDescripcion, BorderLayout.NORTH);
-        panelTxtDescripcion = new JPanel();
-        panelTxtDescripcion.setLayout(flowPanelDescripcion);
         txtDescripcion = new JTextArea(oferta.getDescripcion());
         txtDescripcion.setWrapStyleWord(true);
         txtDescripcion.setLineWrap(true);
         txtDescripcion.setEditable(false);
         txtDescripcion.setBackground(null);
-        panelTxtDescripcion.add(txtDescripcion);
-        panelDescripcion.add(panelTxtDescripcion, BorderLayout.CENTER);
+        txtDescripcion.setMargin(new Insets(10, 20, 10, 20));
+        JScrollPane scrollDescripcion = new JScrollPane(txtDescripcion);
+        scrollDescripcion.setBorder(null);
+        panelDescripcion.add(scrollDescripcion, BorderLayout.CENTER);
         panelSalario = new JPanel();
         FlowLayout flowPanelSalario = new FlowLayout(FlowLayout.LEFT);
         flowPanelSalario.setHgap(20);
@@ -102,12 +111,22 @@ public class VentanaDetallesOferta extends JFrame {
         panelHorario.add(panelLblHorario, BorderLayout.NORTH);
         String numeroOfertas = String.valueOf(oferta.getNumeroVacantes());
         panelLblHorario.add(lblNumeroVacantes = new JLabel("Numero vacantes: "+numeroOfertas+". "), BorderLayout.NORTH);
-         panelLblHorario.add(new JLabel("Horario:"), BorderLayout.SOUTH);
+        panelLblHorario.add(new JLabel("Horario:"), BorderLayout.SOUTH);
         scrollDias = new JScrollPane(panelDias = new JPanel());
         BoxLayout boxDias = new BoxLayout(panelDias, BoxLayout.Y_AXIS);
         panelDias.setLayout(boxDias);
-        panelHorario.add(scrollDias, BorderLayout.CENTER);
+        JPanel panelScrollDias = new JPanel(new BorderLayout());
+        panelScrollDias.add(scrollDias, BorderLayout.NORTH);
+        panelHorario.add(panelScrollDias, BorderLayout.CENTER);
         panelCentral.add(panelHorario);
+    }
+    public void establecerPropiedades(){
+        this.btnCancelar.addMouseListener(this);
+        if (tipoUsuario > 0){
+            this.btnAceptar.setText("Ok");
+            this.btnAceptar.addMouseListener(this);
+            this.btnCancelar.setVisible(false);
+        }
     }
     public void mostrarDias(){
         ArrayList<Dia> dias = oferta.getListaDias();
@@ -127,5 +146,38 @@ public class VentanaDetallesOferta extends JFrame {
             panelDias.setVisible(false);
             panelDias.setVisible(true);
         }
+    }
+    
+    /**
+     * Implementación de eventos:
+     */
+
+    @Override
+    public void mouseClicked(MouseEvent evento) {
+        if (evento.getSource().equals(this.btnAceptar)){
+            if (this.btnAceptar.getText().equals("Lo quiero!")){
+                
+            }else{
+                dispose();
+            }
+        }else if(evento.getSource().equals(this.btnCancelar)){
+            dispose();
+        }
+    }
+    @Override
+    public void mousePressed(MouseEvent evento) {
+        
+    }
+    @Override
+    public void mouseReleased(MouseEvent evento) {
+        
+    }
+    @Override
+    public void mouseEntered(MouseEvent evento) {
+        
+    }
+    @Override
+    public void mouseExited(MouseEvent evento) {
+        
     }
 }

@@ -256,7 +256,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         constantes.gridy=13;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
-        panelPrincipal.add(checkDomingo = new JCheckBox("Sabado"), constantes);
+        panelPrincipal.add(checkDomingo = new JCheckBox("Domingo"), constantes);
         constantes.gridx=3;
         constantes.gridy=13;
         constantes.gridwidth = 1;
@@ -443,6 +443,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     @Override
     public void mouseClicked(MouseEvent evento) {
         if (evento.getSource().equals(this.btnCancelar)){
+            new VentanaPrincipal(idCuenta);
             dispose();
         }
         if (evento.getSource().equals(this.btnCrear)){
@@ -478,7 +479,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
                     JOptionPane.showMessageDialog(null, "La hora de inicio no puede ser mayor a la hora de fin y viceversa.");
                 break;
                 case exito:
-                    if (oferta != null){
+                    if (ofertaGeneral != null){
                          EditarOfertaDAO editarOferta = new EditarOfertaDAO();
                          editarOferta.editarOferta(oferta, idEmpleador, ofertaGeneral.getIdOferta());
                          editarOferta.editarDias(oferta.getListaDias(), ofertaGeneral.getIdOferta());

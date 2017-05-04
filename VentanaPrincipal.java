@@ -10,11 +10,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 
-public class VentanaPrincipal extends JFrame implements MouseListener{
+public class VentanaPrincipal extends JFrame implements MouseListener, KeyListener{
     private JButton btnEditarInformacion;
     private JButton btnNuevaOferta;
     private JButton btnCerrarSesion;
@@ -36,6 +42,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
     private JScrollPane scrollOfertas;
     private JPanel panelOfertas;
     private JLabel lblOfertas;
+    private JPanel panelBusqueda;
     
     private Solicitante solicitante;
     private Empleador empleador;
@@ -43,6 +50,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
     
     private int tipo;
     private int idCuenta;
+    private int bagY = 0;
     
     public VentanaPrincipal(int idCuenta){
         this.idCuenta=idCuenta;
@@ -65,6 +73,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         }else{
             empleador = ventanaPrincipal.getEmpleador(idCuenta);
             lblNombre.setText("Empresa: "+empleador.getNombreEmpresa());
+            panelBusqueda.setVisible(false);
             txtBusqueda.setVisible(false);
             btnBuscarOferta.setVisible(false);
             mostrarOfertasEmpleador(empleador.getListaOfertas());
@@ -90,8 +99,11 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         flowDerecho.setVgap(10);
         panelDerecho.setLayout(flowDerecho);
         panelDerecho.add(btnNuevaOferta = new JButton("Nueva oferta"));
-        panelDerecho.add(txtBusqueda = new JTextField("hola mundo")); 
-        panelDerecho.add(btnBuscarOferta = new JButton("Buscar oferta"));
+        this.panelBusqueda = new JPanel(new GridLayout(1, 2));
+        panelBusqueda.add(txtBusqueda = new JTextField());
+        txtBusqueda.addKeyListener(this);
+        panelBusqueda.add(btnBuscarOferta = new JButton("Buscar oferta"));
+        panelDerecho.add(panelBusqueda);
         panelDerecho.add(btnCerrarSesion = new JButton("Cerrar sesión"));
         btnNuevaOferta.addMouseListener(this);
         btnCerrarSesion.addMouseListener(this);
@@ -111,10 +123,10 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         }
         panelCentral.add(lblOfertas = new JLabel(tituloOfertas), BorderLayout.PAGE_START);
         panelCentral.add(scrollOfertas = new JScrollPane(panelOfertas = new JPanel()), BorderLayout.CENTER);
-        GridLayout gridOfertas = new GridLayout();
-        gridOfertas.setColumns(1);
-        gridOfertas.setRows(10);
-        panelOfertas.setLayout(gridOfertas);
+        
+        GridBagLayout bagOfertas = new GridBagLayout();
+        
+        panelOfertas.setLayout(/*new BoxLayout(panelOfertas, BoxLayout.Y_AXIS)*/bagOfertas);
     }
     public void mostrarOfertas(ArrayList<Oferta> listaOfertas){
         panelOfertas.removeAll();
@@ -139,8 +151,16 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             panelDatos.add(empresa);
             panelDatos.add(vacante);
             panelOferta.add(panelDatos, BorderLayout.LINE_START);
-            panelOfertas.add(panelOferta);
             panelOferta.setBorder(BorderFactory.createLineBorder(Color.gray));
+            GridBagConstraints constantes = new GridBagConstraints();
+            constantes.insets= new Insets(5, 5, 5, 5);
+            constantes.anchor= GridBagConstraints.NORTHEAST;
+            constantes.gridx = 0;
+            constantes.gridy = bagY++;
+            constantes.gridheight = 1;
+            constantes.weightx=2;
+            constantes.fill = GridBagConstraints.HORIZONTAL;
+            panelOfertas.add(panelOferta, constantes);
         }
         panelOfertas.setVisible(false);
         panelOfertas.setVisible(true);
@@ -153,6 +173,9 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             panelOferta.setLayout(new BorderLayout());
             JLabel vacante = new JLabel(oferta.getVacante());
             JLabel vacantes = new JLabel(String.valueOf(oferta.getNumeroVacantes()));
+            JButton botonVerMas = new JButton("Ver más");
+            botonVerMas.setName(String.valueOf(oferta.getIdOferta()));
+            botonVerMas.addMouseListener(this);
             JButton botonEditar = new JButton("Editar");
             botonEditar.setName(String.valueOf(oferta.getIdOferta()));
             botonEditar.addMouseListener(this);
@@ -161,6 +184,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             botonEliminar.addMouseListener(this);
             JPanel panelBoton = new JPanel();
             panelBoton.setLayout(new FlowLayout(FlowLayout.RIGHT));
+            panelBoton.add(botonVerMas);
             panelBoton.add(botonEditar);
             panelBoton.add(botonEliminar);
             JPanel panelDatos = new JPanel();
@@ -172,8 +196,16 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
             panelDatos.add(vacante);
             panelOferta.add(panelDatos, BorderLayout.LINE_START);
             panelOferta.add(panelBoton, BorderLayout.LINE_END);
-            panelOfertas.add(panelOferta);
             panelOferta.setBorder(BorderFactory.createLineBorder(Color.gray));
+            GridBagConstraints constantes = new GridBagConstraints();
+            constantes.insets= new Insets(5, 5, 5, 5);
+            constantes.anchor= GridBagConstraints.NORTHEAST;
+            constantes.gridx = 0;
+            constantes.gridy = bagY++;
+            constantes.gridheight = 1;
+            constantes.weightx=2;
+            constantes.fill = GridBagConstraints.HORIZONTAL;
+            panelOfertas.add(panelOferta, constantes);
         }
         panelOfertas.setVisible(false);
         panelOfertas.setVisible(true);
@@ -196,7 +228,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();
             if (boton.getText().equals("Ver más")){
-                new VentanaDetallesOferta(Integer.parseInt(boton.getName()));
+                new VentanaDetallesOferta(Integer.parseInt(boton.getName()), tipo);
             }else if(boton.getText().equals("Eliminar")){
                 EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
                 eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
@@ -228,6 +260,24 @@ public class VentanaPrincipal extends JFrame implements MouseListener{
     }
     @Override
     public void mouseExited(MouseEvent evento) {
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent evento) {
+        if (evento.getSource().equals(this.txtBusqueda)){
+            if (evento.getKeyChar()==10){
+                VentanaPrincipalDAO ventanaPrincipal = new VentanaPrincipalDAO();
+                mostrarOfertas(ventanaPrincipal.getOfertasPorClave(this.txtBusqueda.getText()));
+            }
+        }
+    }
+    @Override
+    public void keyPressed(KeyEvent evento) {
+        
+    }
+    @Override
+    public void keyReleased(KeyEvent evento) {
         
     }
 }
