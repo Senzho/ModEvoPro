@@ -12,12 +12,15 @@ import javax.swing.JScrollPane;
 import LogicaNegocio.DetallesOfertaDAO;
 import LogicaNegocio.Dia;
 import LogicaNegocio.Oferta;
+import LogicaNegocio.OfertaRespondidaDAO;
+import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class VentanaDetallesOferta extends JFrame implements MouseListener{
     private JButton btnAceptar;
@@ -37,11 +40,11 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
     private JLabel lblNumeroVacantes;
     private JPanel panelDias;
     private JTextArea txtDescripcion;
-    private JScrollPane scrollDias;
-    
+    private JScrollPane scrollDias;  
     private int idOferta;
     private Oferta oferta;
     private int tipoUsuario;
+    private int idSolicitante;
     
     public VentanaDetallesOferta(int idOferta, int tipoUsuario){
         this.idOferta=idOferta;
@@ -116,15 +119,16 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
         BoxLayout boxDias = new BoxLayout(panelDias, BoxLayout.Y_AXIS);
         panelDias.setLayout(boxDias);
         JPanel panelScrollDias = new JPanel(new BorderLayout());
+        panelScrollDias.setBackground(Color.WHITE);
         panelScrollDias.add(scrollDias, BorderLayout.NORTH);
         panelHorario.add(panelScrollDias, BorderLayout.CENTER);
         panelCentral.add(panelHorario);
     }
     public void establecerPropiedades(){
         this.btnCancelar.addMouseListener(this);
+        this.btnAceptar.addMouseListener(this);
         if (tipoUsuario > 0){
             this.btnAceptar.setText("Ok");
-            this.btnAceptar.addMouseListener(this);
             this.btnCancelar.setVisible(false);
         }
     }
@@ -133,9 +137,11 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
         for(int c=0;c< dias.size();c++){
             Dia dia = dias.get(c);
             JPanel panelDia = new JPanel();
+            panelDia.setBackground(Color.LIGHT_GRAY);
             panelDia.setLayout(new BorderLayout());
             JLabel nombre = new JLabel(dia.getNombre());
             JPanel panelHoras = new JPanel(new FlowLayout());
+            panelHoras.setBackground(Color.LIGHT_GRAY);
             JLabel inicio = new JLabel(dia.getHoraInicio());
             JLabel fin = new JLabel(dia.getHoraFin());
             panelDia.add(nombre, BorderLayout.LINE_START);
@@ -147,6 +153,19 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
             panelDias.setVisible(true);
         }
     }
+    public void setIdSolicitante(int idSolicitante){
+        this.idSolicitante = idSolicitante;
+    }
+    public void responderOferta(){
+        OfertaRespondidaDAO ofertaRespondida = new OfertaRespondidaDAO();
+        int idEmpleador = ofertaRespondida.getIdEmpleador(idOferta);
+        if (ofertaRespondida.guardarOfertaRespondida(idEmpleador, idSolicitante, idOferta)){
+            JOptionPane.showMessageDialog(null, "Listo!");
+            dispose();
+        }else{
+            JOptionPane.showMessageDialog(null, "Los sentimos, no se pudo realizar la operación, intente de nuevo más tarde");
+        }
+    }
     
     /**
      * Implementación de eventos:
@@ -156,7 +175,7 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
     public void mouseClicked(MouseEvent evento) {
         if (evento.getSource().equals(this.btnAceptar)){
             if (this.btnAceptar.getText().equals("Lo quiero!")){
-                
+                this.responderOferta();
             }else{
                 dispose();
             }

@@ -20,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -123,16 +122,23 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         }
         panelCentral.add(lblOfertas = new JLabel(tituloOfertas), BorderLayout.PAGE_START);
         panelCentral.add(scrollOfertas = new JScrollPane(panelOfertas = new JPanel()), BorderLayout.CENTER);
-        
+        panelOfertas.setBackground(Color.WHITE);
         GridBagLayout bagOfertas = new GridBagLayout();
-        
-        panelOfertas.setLayout(/*new BoxLayout(panelOfertas, BoxLayout.Y_AXIS)*/bagOfertas);
+        panelOfertas.setLayout(bagOfertas);
+        if (tipo == 1){
+            JPanel panelRespuestas = new JPanel(new FlowLayout());
+            JButton boton = new JButton("Respuestas");
+            boton.addMouseListener(this);
+            panelRespuestas.add(boton);
+            contenedor.add(panelRespuestas, BorderLayout.PAGE_END);
+        }
     }
     public void mostrarOfertas(ArrayList<Oferta> listaOfertas){
         panelOfertas.removeAll();
         for (int c = 0; c<listaOfertas.size(); c++){
             Oferta oferta = listaOfertas.get(c);
             JPanel panelOferta = new JPanel();
+            panelOferta.setBackground(Color.LIGHT_GRAY);
             panelOferta.setLayout(new BorderLayout());
             JLabel vacante = new JLabel("Vacante: "+oferta.getVacante());
             JLabel empresa = new JLabel("Empresa: "+oferta.getEmpresa());
@@ -140,10 +146,13 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
             botonVerMas.setName(String.valueOf(oferta.getIdOferta()));
             botonVerMas.addMouseListener(this);
             JPanel panelBoton = new JPanel();
+            panelBoton.setBackground(Color.LIGHT_GRAY);
             panelBoton.setLayout(new FlowLayout());
             panelBoton.add(botonVerMas);
             panelOferta.add(panelBoton, BorderLayout.LINE_END);
             JPanel panelDatos = new JPanel();
+            panelDatos.setBackground(Color.LIGHT_GRAY);
+            setBackground(Color.red);
             FlowLayout flowDatos = new FlowLayout();
             flowDatos.setHgap(20);
             flowDatos.setVgap(10);
@@ -169,7 +178,9 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         panelOfertas.removeAll();
         for (int c = 0; c<listaOfertas.size(); c++){
             Oferta oferta = listaOfertas.get(c);
+            
             JPanel panelOferta = new JPanel();
+            panelOferta.setBackground(Color.LIGHT_GRAY);
             panelOferta.setLayout(new BorderLayout());
             JLabel vacante = new JLabel(oferta.getVacante());
             JLabel vacantes = new JLabel(String.valueOf(oferta.getNumeroVacantes()));
@@ -182,12 +193,16 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
             JButton botonEliminar = new JButton("Eliminar");
             botonEliminar.setName(String.valueOf(oferta.getIdOferta()));
             botonEliminar.addMouseListener(this);
+            
             JPanel panelBoton = new JPanel();
+            panelBoton.setBackground(Color.LIGHT_GRAY);
             panelBoton.setLayout(new FlowLayout(FlowLayout.RIGHT));
             panelBoton.add(botonVerMas);
             panelBoton.add(botonEditar);
             panelBoton.add(botonEliminar);
+            
             JPanel panelDatos = new JPanel();
+            panelDatos.setBackground(Color.LIGHT_GRAY);
             FlowLayout flowDatos = new FlowLayout();
             flowDatos.setHgap(20);
             flowDatos.setVgap(10);
@@ -228,7 +243,10 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();
             if (boton.getText().equals("Ver más")){
-                new VentanaDetallesOferta(Integer.parseInt(boton.getName()), tipo);
+                VentanaDetallesOferta ventana = new VentanaDetallesOferta(Integer.parseInt(boton.getName()), tipo);
+                if (tipo==0){
+                    ventana.setIdSolicitante(solicitante.getIdSolicitante());
+                }
             }else if(boton.getText().equals("Eliminar")){
                 EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
                 eliminarOferta.eliminarDiasOferta(Integer.parseInt(boton.getName()));
@@ -243,6 +261,8 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
                 Oferta oferta = detallesOferta.getOferta(Integer.parseInt(boton.getName()));
                 new VentanaNuevaOferta(empleador.getIdEmpleador(), empleador.getNombreEmpresa(), this.idCuenta, oferta);
                 dispose();
+            }else if(boton.getText().equals("Respuestas")){
+                
             }
         }
     }
