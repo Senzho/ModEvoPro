@@ -160,6 +160,7 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
         OfertaRespondidaDAO ofertaRespondida = new OfertaRespondidaDAO();
         int idEmpleador = ofertaRespondida.getIdEmpleador(idOferta);
         if (ofertaRespondida.guardarOfertaRespondida(idEmpleador, idSolicitante, idOferta)){
+            ofertaRespondida.(idOferta,oferta.getNumeroVacantes());
             JOptionPane.showMessageDialog(null, "Listo!");
             dispose();
         }else{
