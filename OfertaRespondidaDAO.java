@@ -48,4 +48,8 @@ public class OfertaRespondidaDAO implements InterfazOfertaRespondida{
             conexionSql.cerrarConexion();
         }return idEmpleador;
     }
+    @Override
+    public void disminuirVacantes(int idOferta) {
+        
+    }
 }

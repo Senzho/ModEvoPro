@@ -14,7 +14,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -26,7 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyListener, ItemListener{
+public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyListener, WindowListener{
     private JPanel panelPrincipal;
     private JTextField txtVacante;
     private JScrollPane scrollDescripcion;
@@ -68,6 +71,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         setSize(500,500);
         setTitle("Nueva oferta");
         setLocationRelativeTo(null);
+        setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
         this.idEmpleador=idEmpleador;
         this.nombreEmpresa=nombreEmpresa;
         this.ofertaGeneral = oferta;
@@ -281,6 +285,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         panelPrincipal.add(this.btnCancelar = new JButton("Cancelar"), constantes);
     }
     public void establecerPropiedades(){
+        this.addWindowListener(this);
         this.txtAreaDescripcion.setWrapStyleWord(true);
         this.txtAreaDescripcion.setLineWrap(true);
         this.txtAreaDescripcion.addKeyListener(this);
@@ -291,6 +296,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         this.txtVacante.addKeyListener(this);
         this.txtSalario.addKeyListener(this);
         if(ofertaGeneral != null){
+            setTitle("Editar oferta");
             this.btnCrear.setText("Guardar");
             mostrarDatos();
         }
@@ -559,7 +565,32 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     }
 
     @Override
-    public void itemStateChanged(ItemEvent evento) {
+    public void windowOpened(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowClosing(WindowEvent we) {
+        new VentanaPrincipal(idCuenta);
+    }
+    @Override
+    public void windowClosed(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowIconified(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowDeiconified(WindowEvent we) {
+        
+    }
+
+    @Override
+    public void windowActivated(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowDeactivated(WindowEvent we) {
         
     }
 }
