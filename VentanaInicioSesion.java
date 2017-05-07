@@ -31,7 +31,7 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
             setTitle("Bolsa de trabajo UV");
             setSize(395,240);
             setLocationRelativeTo(null);
-            //setIconImage(new ImageIcon(getClass().getResource(icono.getRutaIcono())).getImage());
+            setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
             setVisible(true);
             setResizable(false);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -126,6 +126,7 @@ public class VentanaInicioSesion extends JFrame implements KeyListener, ActionLi
                 inicioSesion();
             }else if(evento.getSource()==botonSalir){
                 dispose();
+                System.exit(0);
             }
         }
 

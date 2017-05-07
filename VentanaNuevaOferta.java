@@ -14,7 +14,10 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -26,7 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyListener, ItemListener{
+public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyListener, WindowListener{
     private JPanel panelPrincipal;
     private JTextField txtVacante;
     private JScrollPane scrollDescripcion;
@@ -68,6 +71,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         setSize(500,500);
         setTitle("Nueva oferta");
         setLocationRelativeTo(null);
+        setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
         this.idEmpleador=idEmpleador;
         this.nombreEmpresa=nombreEmpresa;
         this.ofertaGeneral = oferta;
@@ -256,7 +260,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         constantes.gridy=13;
         constantes.gridwidth = 1;
         constantes.gridheight = 1;
-        panelPrincipal.add(checkDomingo = new JCheckBox("Sabado"), constantes);
+        panelPrincipal.add(checkDomingo = new JCheckBox("Domingo"), constantes);
         constantes.gridx=3;
         constantes.gridy=13;
         constantes.gridwidth = 1;
@@ -281,6 +285,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         panelPrincipal.add(this.btnCancelar = new JButton("Cancelar"), constantes);
     }
     public void establecerPropiedades(){
+        this.addWindowListener(this);
         this.txtAreaDescripcion.setWrapStyleWord(true);
         this.txtAreaDescripcion.setLineWrap(true);
         this.txtAreaDescripcion.addKeyListener(this);
@@ -291,6 +296,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
         this.txtVacante.addKeyListener(this);
         this.txtSalario.addKeyListener(this);
         if(ofertaGeneral != null){
+            setTitle("Editar oferta");
             this.btnCrear.setText("Guardar");
             mostrarDatos();
         }
@@ -443,6 +449,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     @Override
     public void mouseClicked(MouseEvent evento) {
         if (evento.getSource().equals(this.btnCancelar)){
+            new VentanaPrincipal(idCuenta);
             dispose();
         }
         if (evento.getSource().equals(this.btnCrear)){
@@ -478,7 +485,7 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
                     JOptionPane.showMessageDialog(null, "La hora de inicio no puede ser mayor a la hora de fin y viceversa.");
                 break;
                 case exito:
-                    if (oferta != null){
+                    if (ofertaGeneral != null){
                          EditarOfertaDAO editarOferta = new EditarOfertaDAO();
                          editarOferta.editarOferta(oferta, idEmpleador, ofertaGeneral.getIdOferta());
                          editarOferta.editarDias(oferta.getListaDias(), ofertaGeneral.getIdOferta());
@@ -558,7 +565,32 @@ public class VentanaNuevaOferta extends JFrame implements MouseListener, KeyList
     }
 
     @Override
-    public void itemStateChanged(ItemEvent evento) {
+    public void windowOpened(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowClosing(WindowEvent we) {
+        new VentanaPrincipal(idCuenta);
+    }
+    @Override
+    public void windowClosed(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowIconified(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowDeiconified(WindowEvent we) {
+        
+    }
+
+    @Override
+    public void windowActivated(WindowEvent we) {
+        
+    }
+    @Override
+    public void windowDeactivated(WindowEvent we) {
         
     }
 }
