@@ -50,20 +50,38 @@ public class OfertaRespondidaDAO implements InterfazOfertaRespondida{
     }
     @Override
     public void disminuirVacantes(int idOferta, int numeroVacante) {
-		 ConexionSQL conexionSql = new ConexionSQL();
+        ConexionSQL conexionSql = new ConexionSQL();
         Connection conexion = conexionSql.getConexion();
         try{
-            numeroVacante - = numeroVancante;
-            PreparedStatement orden = conexion.prepareStatement("update oferta set numeroVacante = ? where idOferta = ?");
-            orden.setInt(1, numeroVancante);
+            numeroVacante--;
+            PreparedStatement orden = conexion.prepareStatement("update oferta set numeroVacantes = ? where idOferta = ?");
+            orden.setInt(1, numeroVacante);
             orden.setInt(2, idOferta);
             orden.executeUpdate();
         }catch(SQLException | NullPointerException excepcion){
-            System.out.println(excepcion.getMessage());
             Logger logger = Logger.getLogger("Logger");
             logger.log(Level.WARNING, "La conexión podría ser nula | la sentencia SQL esta mal");
         }finally{
             conexionSql.cerrarConexion();
         }
+    }
+    @Override
+    public boolean ofertaRespondida(int idOferta, int idSolicitante) {
+        boolean respondida = false;
+        ConexionSQL conexionSql = new ConexionSQL();
+        Connection conexion = conexionSql.getConexion();
+        try{
+            PreparedStatement orden = conexion.prepareStatement("select * from respuestas where idOferta = ? and idSolicitante = ?");
+            orden.setInt(1, idOferta);
+            orden.setInt(2, idSolicitante);
+            ResultSet resultadoConsulta = orden.executeQuery();
+            if (resultadoConsulta.first()){
+                respondida = true;
+            }
+        }catch(SQLException | NullPointerException excepcion){
+            Logger logger = Logger.getLogger("Logger");
+            logger.log(Level.WARNING, "La conexión podría ser nula | la sentencia SQL esta mal");
+        }
+        return respondida;
     }
 }

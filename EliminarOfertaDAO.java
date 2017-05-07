@@ -19,6 +19,7 @@ public class EliminarOfertaDAO implements InterfazEliminarOfertaSql {
             orden.setInt(1, idOferta);
             orden.execute();
         } catch (SQLException | NullPointerException excepcion) {
+            System.out.println(excepcion.getMessage());
             Logger logger = Logger.getLogger("Logger");
             logger.log(Level.WARNING, "La conexión podría ser nula | la sentencia SQL esta mal");
         }finally{
