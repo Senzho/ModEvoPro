@@ -13,16 +13,21 @@ import LogicaNegocio.DetallesOfertaDAO;
 import LogicaNegocio.Dia;
 import LogicaNegocio.Oferta;
 import LogicaNegocio.OfertaRespondidaDAO;
+import LogicaNegocio.VentanaPrincipalDAO;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 
-public class VentanaDetallesOferta extends JFrame implements MouseListener{
+public class VentanaDetallesOferta extends JFrame implements MouseListener, WindowListener{
     private JButton btnAceptar;
     private JButton btnCancelar;
     private JPanel panelPuesto;
@@ -46,7 +51,10 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
     private int tipoUsuario;
     private int idSolicitante;
     
-    public VentanaDetallesOferta(int idOferta, int tipoUsuario){
+    private VentanaPrincipal ventana;
+    
+    public VentanaDetallesOferta(int idOferta, int tipoUsuario, VentanaPrincipal ventana){
+        this.ventana = ventana;
         this.idOferta=idOferta;
         this.tipoUsuario = tipoUsuario;
         DetallesOfertaDAO detallesOferta = new DetallesOfertaDAO();
@@ -109,22 +117,30 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
         panelHorario = new JPanel();
         panelHorario.setLayout(new BorderLayout());
         panelLblHorario = new JPanel();
-        FlowLayout flowLblHorario = new FlowLayout();
         panelLblHorario.setLayout(new BorderLayout());
         panelHorario.add(panelLblHorario, BorderLayout.NORTH);
         String numeroOfertas = String.valueOf(oferta.getNumeroVacantes());
-        panelLblHorario.add(lblNumeroVacantes = new JLabel("Numero vacantes: "+numeroOfertas+". "), BorderLayout.NORTH);
-        panelLblHorario.add(new JLabel("Horario:"), BorderLayout.SOUTH);
+        FlowLayout flowLv = new FlowLayout(FlowLayout.LEFT);
+        flowLv.setHgap(20);
+        JPanel panelLv = new JPanel(flowLv);
+        panelLv.add(lblNumeroVacantes = new JLabel("Numero vacantes: "+numeroOfertas+". "));
+        panelLblHorario.add(panelLv, BorderLayout.NORTH);
+        FlowLayout flowLh = new FlowLayout(FlowLayout.LEFT);
+        flowLh.setHgap(20);
+        JPanel panelLh = new JPanel(flowLh);
+        panelLh.add(new JLabel("Horario:"));
+        panelLblHorario.add(panelLh, BorderLayout.SOUTH);
         scrollDias = new JScrollPane(panelDias = new JPanel());
         BoxLayout boxDias = new BoxLayout(panelDias, BoxLayout.Y_AXIS);
         panelDias.setLayout(boxDias);
         JPanel panelScrollDias = new JPanel(new BorderLayout());
         panelScrollDias.setBackground(Color.WHITE);
-        panelScrollDias.add(scrollDias, BorderLayout.NORTH);
+        panelScrollDias.add(scrollDias, BorderLayout.CENTER);
         panelHorario.add(panelScrollDias, BorderLayout.CENTER);
         panelCentral.add(panelHorario);
     }
     public void establecerPropiedades(){
+        this.addWindowListener(this);
         this.btnCancelar.addMouseListener(this);
         this.btnAceptar.addMouseListener(this);
         if (tipoUsuario > 0){
@@ -139,15 +155,17 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
             JPanel panelDia = new JPanel();
             panelDia.setBackground(Color.LIGHT_GRAY);
             panelDia.setLayout(new BorderLayout());
-            JLabel nombre = new JLabel(dia.getNombre());
-            JPanel panelHoras = new JPanel(new FlowLayout());
+            JLabel nombre = new JLabel("  "+dia.getNombre());
+            JPanel panelHoras = new JPanel(new BorderLayout());
             panelHoras.setBackground(Color.LIGHT_GRAY);
             JLabel inicio = new JLabel(dia.getHoraInicio());
-            JLabel fin = new JLabel(dia.getHoraFin());
+            JLabel fin = new JLabel(dia.getHoraFin()+"  ");
             panelDia.add(nombre, BorderLayout.LINE_START);
-            panelHoras.add(inicio);
-            panelHoras.add(fin);
+            panelHoras.add(inicio, BorderLayout.LINE_START);
+            panelHoras.add(new JLabel(" - "));
+            panelHoras.add(fin, BorderLayout.LINE_END);
             panelDia.add(panelHoras, BorderLayout.LINE_END);
+            panelDia.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 5));
             panelDias.add(panelDia);
             panelDias.setVisible(false);
             panelDias.setVisible(true);
@@ -160,8 +178,11 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
         OfertaRespondidaDAO ofertaRespondida = new OfertaRespondidaDAO();
         int idEmpleador = ofertaRespondida.getIdEmpleador(idOferta);
         if (ofertaRespondida.guardarOfertaRespondida(idEmpleador, idSolicitante, idOferta)){
-            ofertaRespondida.(idOferta,oferta.getNumeroVacantes());
+            ofertaRespondida.disminuirVacantes(idOferta,oferta.getNumeroVacantes());
             JOptionPane.showMessageDialog(null, "Listo!");
+            VentanaPrincipalDAO ventanaPrincipal = new VentanaPrincipalDAO();
+            this.ventana.mostrarOfertas(ventanaPrincipal.getOfertasPorClave(this.ventana.getUltimaBusqueda()));
+            this.ventana.setVentanaDetallesInstanciada(false);
             dispose();
         }else{
             JOptionPane.showMessageDialog(null, "Los sentimos, no se pudo realizar la operación, intente de nuevo más tarde");
@@ -178,9 +199,11 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
             if (this.btnAceptar.getText().equals("Lo quiero!")){
                 this.responderOferta();
             }else{
+                this.ventana.setVentanaDetallesInstanciada(false);
                 dispose();
             }
         }else if(evento.getSource().equals(this.btnCancelar)){
+            this.ventana.setVentanaDetallesInstanciada(false);
             dispose();
         }
     }
@@ -198,6 +221,35 @@ public class VentanaDetallesOferta extends JFrame implements MouseListener{
     }
     @Override
     public void mouseExited(MouseEvent evento) {
+        
+    }
+
+    @Override
+    public void windowOpened(WindowEvent evento) {
+        
+    }
+    @Override
+    public void windowClosing(WindowEvent evento) {
+        this.ventana.setVentanaDetallesInstanciada(false);
+    }
+    @Override
+    public void windowClosed(WindowEvent evento) {
+        
+    }
+    @Override
+    public void windowIconified(WindowEvent evento) {
+        
+    }
+    @Override
+    public void windowDeiconified(WindowEvent evento) {
+        
+    }
+    @Override
+    public void windowActivated(WindowEvent evento) {
+        
+    }
+    @Override
+    public void windowDeactivated(WindowEvent evento) {
         
     }
 }

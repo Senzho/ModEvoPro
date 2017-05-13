@@ -6,6 +6,7 @@ import LogicaNegocio.Oferta;
 import LogicaNegocio.Solicitante;
 import LogicaNegocio.VentanaPrincipalDAO;
 import LogicaNegocio.EliminarOfertaDAO;
+import LogicaNegocio.OfertaRespondidaDAO;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,16 +45,17 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
     private JPanel panelOfertas;
     private JLabel lblOfertas;
     private JPanel panelBusqueda;
-    
     private Solicitante solicitante;
     private Empleador empleador;
     private ArrayList<Oferta> listaOfertas;
-    
     private int tipo;
     private int idCuenta;
     private int bagY = 0;
+    private String ultimaBusqueda = "";
+    private boolean ventanaDetallesInstanciada;
     
     public VentanaPrincipal(int idCuenta){
+        this.ventanaDetallesInstanciada=false;
         this.idCuenta=idCuenta;
         setTitle("Bolsa de trabajo UV");
         setSize(800,500);
@@ -62,7 +64,6 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         setIconImage(new ImageIcon(getClass().getResource("/RecursosGraficos/oferta.png")).getImage());
         setVisible(true);
         setResizable(true);
-        //setDefaultCloseOperation(EXIT_ON_CLOSE);
         VentanaPrincipalDAO ventanaPrincipal = new VentanaPrincipalDAO();
         this.tipo = ventanaPrincipal.getTipoCuenta(idCuenta);
         inicializarComponentes();
@@ -71,6 +72,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
             solicitante = ventanaPrincipal.getSolicitante(idCuenta);
             lblNombre.setText(solicitante.getNombre());
             mostrarOfertas(ventanaPrincipal.getOfertasPorDescripcion(solicitante.getAreaProfesional()));
+            this.ultimaBusqueda = solicitante.getAreaProfesional();
         }else{
             empleador = ventanaPrincipal.getEmpleador(idCuenta);
             lblNombre.setText("Empresa: "+empleador.getNombreEmpresa());
@@ -93,6 +95,7 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         flowIzquierdo.setVgap(10);
         panelIzquierdo.setLayout(flowIzquierdo);
         panelIzquierdo.add(btnEditarInformacion = new JButton("Editar información"));
+        btnEditarInformacion.addMouseListener(this);
         panelIzquierdo.add(lblNombre = new JLabel("Nombre"));
         JPanel panelDerecho = new JPanel();
         FlowLayout flowDerecho = new FlowLayout(FlowLayout.RIGHT);
@@ -137,37 +140,97 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         this.addWindowListener(this);
     }
     public void mostrarOfertas(ArrayList<Oferta> listaOfertas){
+        panelOfertas.removeAll();
         if (listaOfertas.size()==0){
-            JOptionPane.showMessageDialog(null, "No se encuentran ofertas");
+            panelOfertas.add(new JLabel("No se encuentran ofertas"));
+            ultimaBusqueda = "";
         }else{
-            panelOfertas.removeAll();
+            int cont = 0;
+            for (int c = 0; c<listaOfertas.size(); c++){
+                Oferta oferta = listaOfertas.get(c);
+                OfertaRespondidaDAO ofertaRespondida = new OfertaRespondidaDAO();
+                if (oferta.getNumeroVacantes()>0 && !ofertaRespondida.ofertaRespondida(oferta.getIdOferta(), solicitante.getIdSolicitante())){
+                    cont++;
+                    JPanel panelOferta = new JPanel();
+                    panelOferta.setBackground(Color.LIGHT_GRAY);
+                    panelOferta.setLayout(new BorderLayout());
+                    JLabel vacante = new JLabel("Vacante: "+oferta.getVacante());
+                    JLabel empresa = new JLabel("Empresa: "+oferta.getEmpresa());
+                    JButton botonVerMas = new JButton("Ver más");
+                    botonVerMas.setName(String.valueOf(oferta.getIdOferta()));
+                    botonVerMas.addMouseListener(this);
+                    JPanel panelBoton = new JPanel();
+                    panelBoton.setBackground(Color.LIGHT_GRAY);
+                    panelBoton.setLayout(new FlowLayout());
+                    panelBoton.add(botonVerMas);
+                    panelOferta.add(panelBoton, BorderLayout.LINE_END);
+                    JPanel panelDatos = new JPanel();
+                    panelDatos.setBackground(Color.LIGHT_GRAY);
+                    setBackground(Color.red);
+                    FlowLayout flowDatos = new FlowLayout();
+                    flowDatos.setHgap(20);
+                    flowDatos.setVgap(10);
+                    panelDatos.setLayout(flowDatos);
+                    panelDatos.add(empresa);
+                    panelDatos.add(vacante);
+                    panelOferta.add(panelDatos, BorderLayout.LINE_START);
+                    panelOferta.setBorder(BorderFactory.createLineBorder(Color.gray));
+                    GridBagConstraints constantes = new GridBagConstraints();
+                    constantes.insets= new Insets(5, 5, 5, 5);
+                    constantes.anchor= GridBagConstraints.NORTHEAST;
+                    constantes.gridx = 0;
+                    constantes.gridy = bagY++;
+                    constantes.gridheight = 1;
+                    constantes.weightx=2;
+                    constantes.fill = GridBagConstraints.HORIZONTAL;
+                    panelOfertas.add(panelOferta, constantes);
+                }
+            }
+            if (cont == 0){
+                panelOfertas.add(new JLabel("No se encuentran ofertas"));
+                ultimaBusqueda = "";
+            }else{
+                this.txtBusqueda.setText(ultimaBusqueda);
+            }
         }
-        for (int c = 0; c<listaOfertas.size(); c++){
-            Oferta oferta = listaOfertas.get(c);
-            if (oferta.getNumeroVacantes()>0){
+        panelOfertas.setVisible(false);
+        panelOfertas.setVisible(true);
+    }
+    public void mostrarOfertasEmpleador(ArrayList<Oferta> listaOfertas){
+        panelOfertas.removeAll();
+        if (listaOfertas.size()>0){
+            for (int c = 0; c<listaOfertas.size(); c++){
+                Oferta oferta = listaOfertas.get(c);
                 JPanel panelOferta = new JPanel();
                 panelOferta.setBackground(Color.LIGHT_GRAY);
                 panelOferta.setLayout(new BorderLayout());
-                JLabel vacante = new JLabel("Vacante: "+oferta.getVacante());
-                JLabel empresa = new JLabel("Empresa: "+oferta.getEmpresa());
+                JLabel vacante = new JLabel(oferta.getVacante());
+                JLabel vacantes = new JLabel(String.valueOf(oferta.getNumeroVacantes()));
                 JButton botonVerMas = new JButton("Ver más");
                 botonVerMas.setName(String.valueOf(oferta.getIdOferta()));
                 botonVerMas.addMouseListener(this);
+                JButton botonEditar = new JButton("Editar");
+                botonEditar.setName(String.valueOf(oferta.getIdOferta()));
+                botonEditar.addMouseListener(this);
+                JButton botonEliminar = new JButton("Eliminar");
+                botonEliminar.setName(String.valueOf(oferta.getIdOferta()));
+                botonEliminar.addMouseListener(this);
                 JPanel panelBoton = new JPanel();
                 panelBoton.setBackground(Color.LIGHT_GRAY);
-                panelBoton.setLayout(new FlowLayout());
+                panelBoton.setLayout(new FlowLayout(FlowLayout.RIGHT));
                 panelBoton.add(botonVerMas);
-                panelOferta.add(panelBoton, BorderLayout.LINE_END);
+                panelBoton.add(botonEditar);
+                panelBoton.add(botonEliminar);
                 JPanel panelDatos = new JPanel();
                 panelDatos.setBackground(Color.LIGHT_GRAY);
-                setBackground(Color.red);
                 FlowLayout flowDatos = new FlowLayout();
                 flowDatos.setHgap(20);
                 flowDatos.setVgap(10);
                 panelDatos.setLayout(flowDatos);
-                panelDatos.add(empresa);
+                panelDatos.add(vacantes);
                 panelDatos.add(vacante);
                 panelOferta.add(panelDatos, BorderLayout.LINE_START);
+                panelOferta.add(panelBoton, BorderLayout.LINE_END);
                 panelOferta.setBorder(BorderFactory.createLineBorder(Color.gray));
                 GridBagConstraints constantes = new GridBagConstraints();
                 constantes.insets= new Insets(5, 5, 5, 5);
@@ -179,55 +242,9 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
                 constantes.fill = GridBagConstraints.HORIZONTAL;
                 panelOfertas.add(panelOferta, constantes);
             }
-        }
-        panelOfertas.setVisible(false);
-        panelOfertas.setVisible(true);
-    }
-    public void mostrarOfertasEmpleador(ArrayList<Oferta> listaOfertas){
-        panelOfertas.removeAll();
-        for (int c = 0; c<listaOfertas.size(); c++){
-            Oferta oferta = listaOfertas.get(c);
-            JPanel panelOferta = new JPanel();
-            panelOferta.setBackground(Color.LIGHT_GRAY);
-            panelOferta.setLayout(new BorderLayout());
-            JLabel vacante = new JLabel(oferta.getVacante());
-            JLabel vacantes = new JLabel(String.valueOf(oferta.getNumeroVacantes()));
-            JButton botonVerMas = new JButton("Ver más");
-            botonVerMas.setName(String.valueOf(oferta.getIdOferta()));
-            botonVerMas.addMouseListener(this);
-            JButton botonEditar = new JButton("Editar");
-            botonEditar.setName(String.valueOf(oferta.getIdOferta()));
-            botonEditar.addMouseListener(this);
-            JButton botonEliminar = new JButton("Eliminar");
-            botonEliminar.setName(String.valueOf(oferta.getIdOferta()));
-            botonEliminar.addMouseListener(this);
-            JPanel panelBoton = new JPanel();
-            panelBoton.setBackground(Color.LIGHT_GRAY);
-            panelBoton.setLayout(new FlowLayout(FlowLayout.RIGHT));
-            panelBoton.add(botonVerMas);
-            panelBoton.add(botonEditar);
-            panelBoton.add(botonEliminar);
-            JPanel panelDatos = new JPanel();
-            panelDatos.setBackground(Color.LIGHT_GRAY);
-            FlowLayout flowDatos = new FlowLayout();
-            flowDatos.setHgap(20);
-            flowDatos.setVgap(10);
-            panelDatos.setLayout(flowDatos);
-            panelDatos.add(vacantes);
-            panelDatos.add(vacante);
-            panelOferta.add(panelDatos, BorderLayout.LINE_START);
-            panelOferta.add(panelBoton, BorderLayout.LINE_END);
-            panelOferta.setBorder(BorderFactory.createLineBorder(Color.gray));
-            GridBagConstraints constantes = new GridBagConstraints();
-            constantes.insets= new Insets(5, 5, 5, 5);
-            constantes.anchor= GridBagConstraints.NORTHEAST;
-            constantes.gridx = 0;
-            constantes.gridy = bagY++;
-            constantes.gridheight = 1;
-            constantes.weightx=2;
-            constantes.fill = GridBagConstraints.HORIZONTAL;
-            panelOfertas.add(panelOferta, constantes);
-        }
+        }else{
+            panelOfertas.add(new JLabel("No tienes ofertas"));
+        }  
         panelOfertas.setVisible(false);
         panelOfertas.setVisible(true);
     }
@@ -236,13 +253,29 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         String coincidencia = this.txtBusqueda.getText();
         if (!coincidencia.trim().equals("")){
             mostrarOfertas(ventanaPrincipal.getOfertasPorClave(this.txtBusqueda.getText()));
-        }else{
-            mostrarOfertas(ventanaPrincipal.getOfertasPorDescripcion(solicitante.getAreaProfesional()));
+            this.ultimaBusqueda = this.txtBusqueda.getText();
         }
+    }
+    public String getTextoBusqueda(){
+        return this.txtBusqueda.getText();
+    }
+    public String getAreaProfesional(){
+        return this.solicitante.getAreaProfesional();
+    }
+    public String getUltimaBusqueda(){
+        return this.ultimaBusqueda;
+    }
+    public void setVentanaDetallesInstanciada(boolean instancia){
+        this.ventanaDetallesInstanciada = instancia;
     }
     
     @Override
     public void mouseClicked(MouseEvent evento) {
+        if(evento.getSource().equals(this.btnEditarInformacion)){
+            if(tipo == 1){
+                new VentanaInformacionEmpresa(this.empleador);
+            }
+        }
         if (evento.getSource().equals(this.btnBuscarOferta)){
             buscarOfertas();
         }
@@ -257,9 +290,12 @@ public class VentanaPrincipal extends JFrame implements MouseListener, KeyListen
         if (evento.getSource() instanceof JButton){
             JButton boton = (JButton) evento.getSource();
             if (boton.getText().equals("Ver más")){
-                VentanaDetallesOferta ventana = new VentanaDetallesOferta(Integer.parseInt(boton.getName()), tipo);
-                if (tipo==0){
-                    ventana.setIdSolicitante(solicitante.getIdSolicitante());
+                if (!this.ventanaDetallesInstanciada){
+                    VentanaDetallesOferta ventana = new VentanaDetallesOferta(Integer.parseInt(boton.getName()), tipo, this);
+                    this.ventanaDetallesInstanciada = true;
+                    if (tipo==0){
+                        ventana.setIdSolicitante(solicitante.getIdSolicitante());
+                    }
                 }
             }else if(boton.getText().equals("Eliminar")){
                 EliminarOfertaDAO eliminarOferta = new EliminarOfertaDAO();
